@@ -1,78 +1,39 @@
 <h1 align="center">Encore</h1>
 
-<p align="center">An interactive CLI for SvelteKit, Node.js, and Turbo project starters.</p>
+<p align="center">Generate SvelteKit, Node.js, and Turbo project starters.</p>
 
-## Project shapes
+<p align="center">
+  <a aria-label="npm version" href="https://www.npmjs.com/package/encore-cli">
+    <img alt="npm version" src="https://img.shields.io/npm/v/encore-cli?style=flat&color=000&logoColor=000">
+  </a>
+  <a aria-label="License" href="https://github.com/0xposed/encore/blob/master/LICENSE">
+    <img alt="License" src="https://img.shields.io/github/license/0xposed/encore?style=flat&color=000000">
+  </a>
+</p>
 
-Choose a project shape, then select only the extras it needs:
+## Use
 
-| Shape             | Starter                                                        | Optional capabilities                                    |
-| ----------------- | -------------------------------------------------------------- | -------------------------------------------------------- |
-| Frontend          | SvelteKit, Svelte 5, TypeScript, and Tailwind                  | Three.js + Threlte, GSAP, Lenis                          |
-| Backend           | TypeScript service with Winston logging                        | Fastify, MySQL + Drizzle, Socket.IO, TCP and UDP bridges |
-| Frontend + server | Turbo workspace with `packages/frontend` and `packages/server` | Frontend and backend capabilities above                  |
+```sh
+npx encore-cli
+```
 
-The database option includes the client, schema, and migration setup. TCP and UDP bridges provide a starting point for receiving and transforming messages, then publishing events through Socket.IO when selected.
+Encore prompts for a frontend, backend, or Turbo workspace, then asks which optional capabilities to include. It creates the project in a new directory under your current working directory.
 
-## Run locally
+## Included starters
+
+- **Frontend:** SvelteKit, TypeScript, Tailwind CSS; optional Three.js + Threlte, GSAP, and Lenis.
+- **Backend:** TypeScript with Winston logging; optional Fastify, MySQL + Drizzle, Socket.IO, and TCP/UDP bridges.
+- **Turbo:** `packages/frontend` and `packages/server`, with checks for both packages.
+
+## Develop
 
 ```sh
 pnpm install
-pnpm dev
-```
-
-Follow the prompts to name your project and choose its capabilities. Encore creates a new directory relative to your current working directory and refuses existing destinations without overwriting their contents.
-
-Then enter the generated project:
-
-```sh
-cd my-project
-pnpm install
-pnpm dev
-```
-
-Replace `my-project` with the name you chose.
-
-## Build and use
-
-```sh
-pnpm build
-node dist/cli.js
-```
-
-Generated projects use pnpm and are kept intentionally small.
-
-Every generated project includes `pnpm check`. For Turbo projects, it checks both the frontend and server; backend checks run TypeScript without emitting build files.
-
-## Development checks
-
-```sh
 pnpm check
 pnpm test
 pnpm build
 ```
 
-The tests generate temporary projects for all three shapes and check their verification scripts and destination handling. They do not install or build generated projects.
+## Release
 
-## Publish
-
-Encore publishes as `encore-cli` on npm. Before the first release, confirm the package name is available, sign in with an npm account, and run:
-
-```sh
-pnpm install --frozen-lockfile
-pnpm check
-npm pack --dry-run
-```
-
-For each user-facing change, run `pnpm changeset` and commit the generated
-Markdown file with the change. On the release branch, run `pnpm version-packages`,
-review and commit the updated version and changelog, then publish with:
-
-```sh
-npm login
-pnpm release
-```
-
-Changesets updates the version; `prepublishOnly` builds the CLI before npm
-publishes. The package includes the compiled `dist` files, this README, and the
-license.
+Add a release note with `pnpm changeset`. On the release branch, run `pnpm version-packages`, commit the version and changelog updates, then publish with `pnpm release`.
