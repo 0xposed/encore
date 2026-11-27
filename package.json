@@ -1,6 +1,6 @@
 {
   "name": "encore-cli",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Interactive CLI for generating SvelteKit, Node.js, and Turbo project starters.",
   "author": "0xposed <0xposed@pm.me>",
   "license": "WTFPL",
