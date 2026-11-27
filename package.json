@@ -8,18 +8,28 @@
   },
   "scripts": {
     "build": "node scripts/build.mjs",
+    "check": "tsc -p tsconfig.json --noEmit",
     "dev": "tsx src/cli.ts",
-    "check": "tsc -p tsconfig.json --noEmit"
+    "test": "tsx --test tests/generate.test.ts",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "dependencies": {
     "@clack/prompts": "^1.8.1"
   },
   "devDependencies": {
+    "@0xposed/eslint-config": "latest",
+    "@0xposed/prettier-config": "latest",
+    "@0xposed/tsconfig": "latest",
     "@types/node": "^22.19.9",
     "tsx": "^4.19.3",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "eslint": "^9.39.2",
+    "prettier": "^3.8.1"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=20.19.0"
   }
 }

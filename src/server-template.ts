@@ -1,33 +1,35 @@
-import type { BackendOption } from './types.js';
-import { has, json } from './project-template.js';
+import type { BackendOption } from './types.js'
+
+import { has, json } from './project-template.js'
 
 export function serverFiles(
   name: string,
   options: BackendOption[],
-  location: 'root' | 'turbo'
+  location: 'root' | 'turbo',
 ) {
-  const packageName = name.toLowerCase().replace(/[^a-z0-9._-]+/g, '-');
-  const src = location === 'turbo' ? 'packages/server/src/' : 'src/';
+  const packageName = name.toLowerCase().replace(/[^a-z0-9._-]+/g, '-')
+  const src = location === 'turbo' ? 'packages/server/src/' : 'src/'
   const deps: Record<string, string> = {
     chalk: '^5.6.2',
     'pretty-error': '^4.0.0',
     winston: '^3.17.0',
-    'winston-daily-rotate-file': '^5.0.0'
-  };
+    'winston-daily-rotate-file': '^5.0.0',
+  }
   const dev: Record<string, string> = {
     '@types/node': '^22.19.9',
     tsx: '^4.19.3',
-    typescript: '^5.9.3'
-  };
-  if (has(options, 'fastify')) deps.fastify = '^5.2.0';
-  if (has(options, 'database'))
-    (Object.assign(deps, {
+    typescript: '^5.9.3',
+  }
+  if (has(options, 'fastify')) deps.fastify = '^5.2.0'
+  if (has(options, 'database')) {
+    Object.assign(deps, {
+      dotenv: '^17.2.3',
       'drizzle-orm': '^0.44.7',
       mysql2: '^3.12.0',
-      dotenv: '^17.2.3'
-    }),
-      (dev['drizzle-kit'] = '^0.30.6'));
-  if (has(options, 'websocket')) deps['socket.io'] = '^4.8.1';
+    })
+    dev['drizzle-kit'] = '^0.30.6'
+  }
+  if (has(options, 'websocket')) deps['socket.io'] = '^4.8.1'
 
   const files: Record<string, string> = {
     [`${src}index.ts`]: `${has(options, 'fastify') ? "import Fastify from 'fastify';\n" : ''}${has(options, 'websocket') ? "import { Server as SocketServer } from 'socket.io';\n" : ''}${has(options, 'websocket') && !has(options, 'fastify') ? "import { createServer } from 'node:http';\n" : ''}${has(options, 'tcp') ? "import { startTcpBridge } from './bridges/tcp.js';\n" : ''}${has(options, 'udp') ? "import { startUdpBridge } from './bridges/udp.js';\n" : ''}import { serverLogger } from './logging/index.js';
@@ -72,22 +74,22 @@ export function createLogger(context: string) {
 }
 
 export const serverLogger = createLogger('SERVER');
-${has(options, 'database') ? "export const databaseLogger = createLogger('DATABASE');\n" : ''}${has(options, 'websocket') ? "export const websocketLogger = createLogger('WEBSOCKET');\n" : ''}${has(options, 'tcp') ? "export const tcpLogger = createLogger('TCP');\n" : ''}${has(options, 'udp') ? "export const udpLogger = createLogger('UDP');\n" : ''}`
-  };
+${has(options, 'database') ? "export const databaseLogger = createLogger('DATABASE');\n" : ''}${has(options, 'websocket') ? "export const websocketLogger = createLogger('WEBSOCKET');\n" : ''}${has(options, 'tcp') ? "export const tcpLogger = createLogger('TCP');\n" : ''}${has(options, 'udp') ? "export const udpLogger = createLogger('UDP');\n" : ''}`,
+  }
 
   if (has(options, 'websocket')) {
     files[`${src}index.ts`] = files[`${src}index.ts`]
       .replace(
         'import { serverLogger }',
-        'import { serverLogger, websocketLogger }'
+        'import { serverLogger, websocketLogger }',
       )
       .replace(
         "serverLogger.info('Socket.IO client",
-        "websocketLogger.info('Socket.IO client"
-      );
+        "websocketLogger.info('Socket.IO client",
+      )
   }
   files[`${src}pretty-error.d.ts`] =
-    "declare module 'pretty-error' {\n  export default class PrettyError {\n    skipNodeFiles(): void;\n    render(error: Error): string;\n  }\n}\n";
+    "declare module 'pretty-error' {\n  export default class PrettyError {\n    skipNodeFiles(): void;\n    render(error: Error): string;\n  }\n}\n"
 
   if (has(options, 'tcp') || has(options, 'udp'))
     files[`${src}bridges/transform.ts`] =
@@ -96,7 +98,7 @@ ${has(options, 'database') ? "export const databaseLogger = createLogger('DATABA
 export function transform(protocol: 'tcp' | 'udp', message: string, remote: string) {
   return { protocol, message, remote, receivedAt: new Date().toISOString() };
 }
-`;
+`
   if (has(options, 'tcp'))
     files[`${src}bridges/tcp.ts`] = `import { createServer } from 'node:net';
 import { tcpLogger } from '../logging/index.js';
@@ -124,7 +126,7 @@ export function startTcpBridge(publish: Publish) {
   server.listen(port, '0.0.0.0', () => tcpLogger.info('TCP bridge listening on ' + port));
   return server;
 }
-`;
+`
   if (has(options, 'udp'))
     files[`${src}bridges/udp.ts`] = `import { createSocket } from 'node:dgram';
 import { udpLogger } from '../logging/index.js';
@@ -142,7 +144,7 @@ export function startUdpBridge(publish: Publish) {
   socket.bind(port, '0.0.0.0', () => udpLogger.info('UDP bridge listening on ' + port));
   return socket;
 }
-`;
+`
   if (has(options, 'database')) {
     files[`${src}database/client.ts`] = `import 'dotenv/config';
 import mysql from 'mysql2/promise';
@@ -153,7 +155,7 @@ import { databaseLogger } from '../logging/index.js';
 export const pool = mysql.createPool(process.env.DATABASE_URL ?? 'mysql://root:password@localhost:3306/app');
 pool.on('connection', () => databaseLogger.info('MySQL connection established'));
 export const db = drizzle(pool, { schema, mode: 'default' });
-`;
+`
     files[`${src}database/schema.ts`] =
       `import { int, mysqlTable, timestamp, varchar } from 'drizzle-orm/mysql-core';
 
@@ -162,51 +164,52 @@ export const example = mysqlTable('example', {
   name: varchar('name', { length: 255 }).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull()
 });
-`;
+`
   }
 
   if (location === 'turbo') {
     files['packages/server/package.json'] = json({
+      dependencies: deps,
+      devDependencies: dev,
       name: `@${packageName}/server`,
       private: true,
-      type: 'module',
       scripts: {
-        dev: 'tsx watch src/index.ts',
         build: 'tsc -p tsconfig.json',
-        start: 'node dist/index.js',
-        lint: 'eslint .',
-        format: 'prettier --write .',
+        check: 'tsc -p tsconfig.json --noEmit',
         ...(has(options, 'database')
           ? {
               'db:generate': 'drizzle-kit generate',
-              'db:push': 'drizzle-kit push'
+              'db:push': 'drizzle-kit push',
             }
-          : {})
+          : {}),
+        dev: 'tsx watch src/index.ts',
+        format: 'prettier --write .',
+        lint: 'eslint .',
+        start: 'node dist/index.js',
       },
-      dependencies: deps,
-      devDependencies: dev
-    });
+      type: 'module',
+    })
     files['packages/server/tsconfig.json'] =
-      '{"compilerOptions":{"target":"ES2022","module":"NodeNext","moduleResolution":"NodeNext","rootDir":"src","outDir":"dist","strict":true,"skipLibCheck":true,"esModuleInterop":true},"include":["src/**/*.ts"]}\n';
+      '{"extends":"@0xposed/tsconfig/node","compilerOptions":{"rootDir":"src","outDir":"dist"},"include":["src/**/*.ts"]}\n'
     files['packages/server/eslint.config.js'] =
-      "import globals from 'globals';\nimport base from '../../eslint.config.js';\n\nexport default [...base, { languageOptions: { globals: globals.node } }];\n";
+      "export { default } from '@0xposed/eslint-config/node';\n"
     if (has(options, 'database')) {
       files['packages/server/drizzle.config.ts'] = drizzleConfig(
-        './src/database/schema.ts'
-      );
+        './src/database/schema.ts',
+      )
       files['packages/server/.env.example'] =
-        'DATABASE_URL=mysql://root:password@localhost:3306/app\n';
+        'DATABASE_URL=mysql://root:password@localhost:3306/app\n'
     }
   } else {
     files['tsconfig.json'] =
-      '{"compilerOptions":{"target":"ES2022","module":"NodeNext","moduleResolution":"NodeNext","rootDir":"src","outDir":"dist","strict":true,"skipLibCheck":true,"esModuleInterop":true},"include":["src/**/*.ts"]}\n';
+      '{"extends":"@0xposed/tsconfig/node","compilerOptions":{"rootDir":"src","outDir":"dist"},"include":["src/**/*.ts"]}\n'
     if (has(options, 'database')) {
-      files['drizzle.config.ts'] = drizzleConfig('./src/database/schema.ts');
+      files['drizzle.config.ts'] = drizzleConfig('./src/database/schema.ts')
       files['.env.example'] =
-        'DATABASE_URL=mysql://root:password@localhost:3306/app\n';
+        'DATABASE_URL=mysql://root:password@localhost:3306/app\n'
     }
   }
-  return { files, deps, dev };
+  return { deps, dev, files }
 }
 
 function drizzleConfig(schema: string) {
@@ -214,5 +217,5 @@ function drizzleConfig(schema: string) {
 import { defineConfig } from 'drizzle-kit';
 
 export default defineConfig({ schema: '${schema}', out: './drizzle', dialect: 'mysql', dbCredentials: { url: process.env.DATABASE_URL ?? '' } });
-`;
+`
 }

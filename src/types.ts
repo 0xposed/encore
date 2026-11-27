@@ -1,15 +1,10 @@
-export type ProjectShape = 'frontend' | 'backend' | 'turbo';
-export type BackendOption =
-  | 'fastify'
-  | 'database'
-  | 'websocket'
-  | 'tcp'
-  | 'udp';
-export type FrontendOption = 'three' | 'gsap' | 'lenis';
-
+export type BackendOption = 'database' | 'fastify' | 'tcp' | 'udp' | 'websocket'
+export type FrontendOption = 'gsap' | 'lenis' | 'three'
 export type ProjectConfig = {
-  name: string;
-  shape: ProjectShape;
-  backend: BackendOption[];
-  frontend: FrontendOption[];
-};
+  backend: BackendOption[]
+  frontend: FrontendOption[]
+  name: string
+  shape: ProjectShape
+}
+
+export type ProjectShape = 'backend' | 'frontend' | 'turbo'
