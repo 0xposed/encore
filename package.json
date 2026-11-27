@@ -1,7 +1,20 @@
 {
   "name": "encore-cli",
   "version": "0.1.0",
-  "private": true,
+  "description": "Interactive CLI for generating SvelteKit, Node.js, and Turbo project starters.",
+  "author": "0xposed <0xposed@pm.me>",
+  "license": "WTFPL",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/0xposed/encore.git"
+  },
+  "homepage": "https://github.com/0xposed/encore#readme",
+  "bugs": {
+    "url": "https://github.com/0xposed/encore/issues"
+  },
+  "keywords": ["cli", "project-generator", "sveltekit", "fastify", "turbo"],
+  "packageManager": "pnpm@10.17.1",
+  "files": ["dist", "README.md", "LICENSE"],
   "type": "module",
   "bin": {
     "encore": "./dist/cli.js"
@@ -9,12 +22,16 @@
   "scripts": {
     "build": "node scripts/build.mjs",
     "check": "tsc -p tsconfig.json --noEmit",
+    "changeset": "changeset",
     "dev": "tsx src/cli.ts",
     "test": "tsx --test tests/generate.test.ts",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "prepublishOnly": "pnpm build",
+    "release": "changeset publish",
+    "version-packages": "changeset version"
   },
   "dependencies": {
     "@clack/prompts": "^1.8.1"
@@ -23,6 +40,7 @@
     "@0xposed/eslint-config": "latest",
     "@0xposed/prettier-config": "latest",
     "@0xposed/tsconfig": "latest",
+    "@changesets/cli": "^2.31.1",
     "@types/node": "^22.19.9",
     "tsx": "^4.19.3",
     "typescript": "^5.9.3",

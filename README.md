@@ -53,3 +53,26 @@ pnpm build
 ```
 
 The tests generate temporary projects for all three shapes and check their verification scripts and destination handling. They do not install or build generated projects.
+
+## Publish
+
+Encore publishes as `encore-cli` on npm. Before the first release, confirm the package name is available, sign in with an npm account, and run:
+
+```sh
+pnpm install --frozen-lockfile
+pnpm check
+npm pack --dry-run
+```
+
+For each user-facing change, run `pnpm changeset` and commit the generated
+Markdown file with the change. On the release branch, run `pnpm version-packages`,
+review and commit the updated version and changelog, then publish with:
+
+```sh
+npm login
+pnpm release
+```
+
+Changesets updates the version; `prepublishOnly` builds the CLI before npm
+publishes. The package includes the compiled `dist` files, this README, and the
+license.
